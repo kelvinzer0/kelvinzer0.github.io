@@ -1,5 +1,5 @@
-HEX DATA:
-split start Main: EF BF BD 06 06
-split start Fill In: EF BF BD 06 0A
-split start Intro:  EF BF BD 06 07
-split start Ending:  EF BF BD 06 08
+Data HEX:
+split mulai Main: EF BF BD 06 06
+split mulai Fill In: EF BF BD 06 0A
+split mulai Intro:  EF BF BD 06 07
+split mulai Ending:  EF BF BD 06 08
