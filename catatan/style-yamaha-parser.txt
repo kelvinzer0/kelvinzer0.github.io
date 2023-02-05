@@ -1,4 +1,6 @@
 Data HEX:
+Extract midi and mni: 43 41 53 4D 00
+
 split mulai Main: EF BF BD 06 06
 split mulai Fill In: EF BF BD 06 0A
 split mulai Intro:  EF BF BD 06 07
