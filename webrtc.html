@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Call</title>
+  <style>
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .video-container {
+      width: 480px;
+      height: 360px;
+      margin-bottom: 20px;
+    }
+
+    #controls {
+      display: flex;
+      justify-content: center;
+    }
+
+    button {
+      margin: 0 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div id="localVideo" class="video-container">
+      <video id="localVideoStream" autoplay muted></video>
+    </div>
+    <div id="remoteVideo" class="video-container">
+      <video id="remoteVideoStream" autoplay></video>
+    </div>
+    <div id="controls">
+      <button id="callButton">Call</button>
+      <button id="endCallButton">End Call</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+  <script>
+    const localVideo = document.getElementById('localVideoStream');
+    const remoteVideo = document.getElementById('remoteVideoStream');
+    const callButton = document.getElementById('callButton');
+    const endCallButton = document.getElementById('endCallButton');
+
+    let localStream;
+    let peerConnection;
+
+    // Mengambil akses ke webcam dan mikrofon pengguna
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then((stream) => {
+        localStream = stream;
+        localVideo.srcObject = stream;
+      })
+      .catch((error) => {
+        console.error('Error accessing media devices:', error);
+      });
+
+    // Membuat sambungan peer-to-peer menggunakan WebRTC
+    function createPeerConnection() {
+      peerConnection = new RTCPeerConnection();
+
+      // Menambahkan aliran lokal ke sambungan
+      localStream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, localStream);
+      });
+
+      // Menerima aliran jarak jauh dan memainkannya pada elemen video jarak jauh
+      peerConnection.ontrack = (event) => {
+        remoteVideo.srcObject = event.streams[0];
+      };
+
+      // Mengirim pesan ke server untuk memulai panggilan
+      callButton.addEventListener('click', () => {
+        const data = { type: 'call' };
+        socket.emit('message', data);
+      });
+
+      // Mengakhiri panggilan dan memberitahu server
+      endCallButton.addEventListener('click', () => {
+        const data = { type: 'endCall' };
+        socket.emit('message', data);
+        remoteVideo.srcObject = null;
+      });
+    }
+
+    // Menghubungkan ke server menggunakan Socket.IO
+    const socket = io();
+
+    // Menerima pesan dari server
+    socket.on('message', (data) => {
+      if (data.type === 'call') {
+        // Memulai panggilan
+        createPeerConnection();
+        peerConnection.createOffer()
+          .then((offer) => {
+            return peerConnection.setLocalDescription(offer);
+          })
+          .then(() => {
+            const data = { type: 'offer', sdp: peerConnection.localDescription };
+            socket.emit('message', data);
+          })
+          .catch((error) => {
+            console.error('Error creating offer:', error);
+          });
+      } else if (data.type === 'offer') {
+        // Menerima tawaran dan membuat jawaban
+        createPeerConnection();
+        peerConnection.setRemoteDescription(data.sdp)
+          .then(() => {
+            return peerConnection.createAnswer();
+          })
+          .then((answer) => {
+            return peerConnection.setLocalDescription(answer);
+          })
+          .then(() => {
+            const data = { type: 'answer', sdp: peerConnection.localDescription };
+            socket.emit('message', data);
+          })
+          .catch((error) => {
+            console.error('Error creating answer:', error);
+          });
+      } else if (data.type === 'answer') {
+        // Menerima jawaban
+        peerConnection.setRemoteDescription(data.sdp)
+          .catch((error) => {
+            console.error('Error setting remote description:', error);
+          });
+      } else if (data.type === 'endCall') {
+        // Mengakhiri panggilan
+        remoteVideo.srcObject = null;
+        peerConnection.close();
+      }
+    });
+  </script>
+</body>
+
+</html>
