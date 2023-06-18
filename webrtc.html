@@ -2,10 +2,12 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Call</title>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebRTC Demo</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap');
         body {
             margin: 0;
             padding: 0;
@@ -15,7 +17,7 @@
             height: 100vh;
             background-color: #f5f5f5;
         }
-
+        
         .video-container {
             position: relative;
             width: 100%;
@@ -24,18 +26,19 @@
             max-height: 600px;
             background-color: #000;
         }
-
+        
         .video-container video {
             position: absolute;
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transform: scaleX(-1);
         }
-
+        
         .video-container .remote-video {
             z-index: 1;
         }
-
+        
         .video-container .local-video {
             z-index: 2;
             width: 30%;
@@ -46,107 +49,278 @@
             border: 2px solid #fff;
             box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
         }
+        
+        .action-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .action-container .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .action-container.show {
+            display: flex;
+        }
+        
+        .action-container h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+        
+        .action-container p {
+            margin: 0;
+            margin-bottom: 10px;
+        }
+        
+        .action-container input {
+            display: block;
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        
+        .action-container button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+        
+        .action-container button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .action-container button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 
 <body>
     <div class="video-container">
-        <video id="remoteVideoStream" class="remote-video" autoplay></video>
-        <video id="localVideoStream" class="local-video" autoplay muted></video>
+        <video id="remoteVideo" class="remote-video" autoplay></video>
+        <video id="webcamVideo" class="local-video" autoplay muted></video>
     </div>
 
-    <button id="callButton">Call</button>
+    <div class="action-container">
+        <div class="modal-content">
+            <button id="closeButton" class="close-button">Close</button>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+            <button id="webcamButton">Start webcam</button>
+            <h2>2. Create a new Call</h2>
+            <button id="callButton" disabled>Create Call (offer)</button>
+
+            <h2>3. Join a Call</h2>
+            <p>Answer the call from a different browser window or device</p>
+
+            <input id="callInput" />
+            <button id="answerButton" disabled>Answer</button>
+
+            <h2>4. Hangup</h2>
+
+            <button id="hangupButton" disabled>Hangup</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/7.5.0/adapter.min.js"></script>
+
+
     <script>
-        const remoteVideo = document.getElementById('remoteVideoStream');
-        const localVideo = document.getElementById('localVideoStream');
+        document.addEventListener("DOMContentLoaded", function() {
+            var actionContainer = document.querySelector(".action-container");
+            var webcamButton = document.querySelector("#webcamButton");
+            var closeButton = document.querySelector("#closeButton");
+            webcamButton.addEventListener("click", function() {
+                actionContainer.style.display = "flex";
+            });
 
-        let localStream;
-        let peerConnection;
+            closeButton.addEventListener("click", function() {
+                actionContainer.style.display = "none";
+            });
+            // Tampilkan action-container saat halaman pertama kali dimuat
+            actionContainer.style.display = "flex";
+        });
+    </script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCFBUfjIg4KyWdVynkiS2-U99qhYfTq2AY",
+            authDomain: "webrtc-3a3ee.firebaseapp.com",
+            projectId: "webrtc-3a3ee",
+            storageBucket: "webrtc-3a3ee.appspot.com",
+            messagingSenderId: "122254084300",
+            appId: "1:122254084300:web:80bae449c2375d238b1a69",
+            measurementId: "G-40DS3YSWXS"
+        };
 
-        // Mengambil akses ke webcam dan mikrofon pengguna
-        navigator.mediaDevices.getUserMedia({
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const firestore = firebase.firestore();
+
+        const servers = {
+            iceServers: [{
+                urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
+            }],
+            iceCandidatePoolSize: 10,
+        };
+
+        // Global State
+        const pc = new RTCPeerConnection(servers);
+        let localStream = null;
+        let remoteStream = null;
+
+        // HTML elements
+        const webcamButton = document.getElementById('webcamButton');
+        const webcamVideo = document.getElementById('webcamVideo');
+        const callButton = document.getElementById('callButton');
+        const callInput = document.getElementById('callInput');
+        const answerButton = document.getElementById('answerButton');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const hangupButton = document.getElementById('hangupButton');
+
+        // 1. Setup media sources
+
+        webcamButton.onclick = async() => {
+            localStream = await navigator.mediaDevices.getUserMedia({
                 video: true,
                 audio: true
-            })
-            .then((stream) => {
-                localStream = stream;
-                localVideo.srcObject = stream;
-                startVideoCall();
-            })
-            .catch((error) => {
-                console.error('Error accessing media devices:', error);
             });
+            remoteStream = new MediaStream();
 
-        // Membuat sambungan peer-to-peer menggunakan WebRTC
-        function startVideoCall() {
-            const configuration = {
-                iceServers: [{
-                    urls: 'stun:stun.l.google.com:19302'
-                }]
-            };
-            peerConnection = new RTCPeerConnection(configuration);
-
-            // Menambahkan aliran lokal ke sambungan
+            // Push tracks from local stream to peer connection
             localStream.getTracks().forEach((track) => {
-                peerConnection.addTrack(track, localStream);
+                pc.addTrack(track, localStream);
             });
 
-            // Menerima aliran jarak jauh dan memainkannya pada elemen video jarak jauh
-            peerConnection.ontrack = (event) => {
-                remoteVideo.srcObject = event.streams[0];
+            // Pull tracks from remote stream, add to video stream
+            pc.ontrack = (event) => {
+                event.streams[0].getTracks().forEach((track) => {
+                    remoteStream.addTrack(track);
+                });
             };
 
-            // Menerima tawaran (offer) dari klien lain
-            socket.on('offer', (offer) => {
-                peerConnection.setRemoteDescription(offer)
-                    .then(() => peerConnection.createAnswer())
-                    .then((answer) => peerConnection.setLocalDescription(answer))
-                    .then(() => {
-                        // Mengirim jawaban (answer) ke klien lain
-                        socket.emit('answer', peerConnection.localDescription);
-                    })
-                    .catch((error) => console.error('Error creating answer:', error));
+            webcamVideo.srcObject = localStream;
+            remoteVideo.srcObject = remoteStream;
+
+            callButton.disabled = false;
+            answerButton.disabled = false;
+            webcamButton.disabled = true;
+        };
+
+        // 2. Create an offer
+        callButton.onclick = async() => {
+            // Reference Firestore collections for signaling
+            const callDoc = firestore.collection('calls').doc();
+            const offerCandidates = callDoc.collection('offerCandidates');
+            const answerCandidates = callDoc.collection('answerCandidates');
+
+            callInput.value = callDoc.id;
+
+            // Get candidates for caller, save to db
+            pc.onicecandidate = (event) => {
+                event.candidate && offerCandidates.add(event.candidate.toJSON());
+            };
+
+            // Create offer
+            const offerDescription = await pc.createOffer();
+            await pc.setLocalDescription(offerDescription);
+
+            const offer = {
+                sdp: offerDescription.sdp,
+                type: offerDescription.type,
+            };
+
+            await callDoc.set({
+                offer
             });
 
-            // Menerima jawaban (answer) dari klien lain
-            socket.on('answer', (answer) => {
-                peerConnection.setRemoteDescription(answer)
-                    .catch((error) => console.error('Error setting remote description:', error));
+            // Listen for remote answer
+            callDoc.onSnapshot((snapshot) => {
+                const data = snapshot.data();
+                if (!pc.currentRemoteDescription && data.answer) {
+                    const answerDescription = new RTCSessionDescription(data.answer);
+                    pc.setRemoteDescription(answerDescription);
+                }
             });
 
-            // Menerima kandidat ICE (ice-candidate) dari klien lain
-            socket.on('ice-candidate', (candidate) => {
-                peerConnection.addIceCandidate(candidate)
-                    .catch((error) => console.error('Error adding ICE candidate:', error));
+            // When answered, add candidate to peer connection
+            answerCandidates.onSnapshot((snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added') {
+                        const candidate = new RTCIceCandidate(change.doc.data());
+                        pc.addIceCandidate(candidate);
+                    }
+                });
             });
-        }
 
-        // Mengirim tawaran (offer) ke klien lain
-        function sendOffer() {
-            peerConnection.createOffer()
-                .then((offer) => peerConnection.setLocalDescription(offer))
-                .then(() => {
-                    // Mengirim tawaran (offer) ke klien lain
-                    socket.emit('offer', peerConnection.localDescription);
-                })
-                .catch((error) => console.error('Error creating offer:', error));
-        }
+            hangupButton.disabled = false;
+        };
 
-        // Mengirim kandidat ICE (ice-candidate) ke klien lain
-        function sendIceCandidate(event) {
-            if (event.candidate) {
-                socket.emit('ice-candidate', event.candidate);
-            }
-        }
+        // 3. Answer the call with the unique ID
+        answerButton.onclick = async() => {
+            const callId = callInput.value;
+            const callDoc = firestore.collection('calls').doc(callId);
+            const answerCandidates = callDoc.collection('answerCandidates');
+            const offerCandidates = callDoc.collection('offerCandidates');
 
-        // Menambahkan event listener saat sambungan peer-to-peer terbentuk
-        peerConnection.addEventListener('icecandidate', sendIceCandidate);
+            pc.onicecandidate = (event) => {
+                event.candidate && answerCandidates.add(event.candidate.toJSON());
+            };
 
-        // Menambahkan event listener saat tombol "Call" ditekan
-        const callButton = document.getElementById('callButton');
-        callButton.addEventListener('click', sendOffer);
+            const callData = (await callDoc.get()).data();
+
+            const offerDescription = callData.offer;
+            await pc.setRemoteDescription(new RTCSessionDescription(offerDescription));
+
+            const answerDescription = await pc.createAnswer();
+            await pc.setLocalDescription(answerDescription);
+
+            const answer = {
+                type: answerDescription.type,
+                sdp: answerDescription.sdp,
+            };
+
+            await callDoc.update({
+                answer
+            });
+
+            offerCandidates.onSnapshot((snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    console.log(change);
+                    if (change.type === 'added') {
+                        let data = change.doc.data();
+                        pc.addIceCandidate(new RTCIceCandidate(data));
+                    }
+                });
+            });
+        };
     </script>
 </body>
 
