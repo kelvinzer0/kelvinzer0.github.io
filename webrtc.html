@@ -7,8 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WebRTC Demo</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css?family=Roboto');
         body {
+            font-family: 'Roboto';
             margin: 0;
             padding: 0;
             display: flex;
@@ -118,13 +119,32 @@
         .action-container button:hover {
             background-color: #0056b3;
         }
+        /* Added CSS for hamburger menu button */
+        
+        .menu-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 999;
+            color: #fff;
+        }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 </head>
 
 <body>
     <div class="video-container">
         <video id="remoteVideo" class="remote-video" autoplay></video>
         <video id="webcamVideo" class="local-video" autoplay muted></video>
+        <div class="menu-button">
+            <i class="fas fa-bars"></i>
+        </div>
     </div>
 
     <div class="action-container">
@@ -155,15 +175,17 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             var actionContainer = document.querySelector(".action-container");
-            var webcamButton = document.querySelector("#webcamButton");
+            var menuButton = document.querySelector(".menu-button");
             var closeButton = document.querySelector("#closeButton");
-            webcamButton.addEventListener("click", function() {
+
+            menuButton.addEventListener("click", function() {
                 actionContainer.style.display = "flex";
             });
 
             closeButton.addEventListener("click", function() {
                 actionContainer.style.display = "none";
             });
+
             // Tampilkan action-container saat halaman pertama kali dimuat
             actionContainer.style.display = "flex";
         });
