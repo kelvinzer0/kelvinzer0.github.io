@@ -319,7 +319,7 @@
       // Listen for remote answer
       callDoc.onSnapshot((snapshot) => {
         const data = snapshot.data();
-        if (!pc.currentRemoteDescription && data?.answer) {
+        if (!pc.currentRemoteDescription && data && data.answer) {
           const answerDescription = new RTCSessionDescription(data.answer);
           pc.setRemoteDescription(answerDescription);
         }
@@ -370,6 +370,8 @@
         });
       };
 
+
+  
       answerCandidates.onSnapshot((snapshot) => {
         snapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
