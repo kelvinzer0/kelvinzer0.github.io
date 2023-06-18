@@ -262,6 +262,7 @@
         audio: true,
       });
       remoteStream = new MediaStream();
+        console.log("localStream:", localStream);
 
       // Push tracks from local stream to peer connection
       localStream.getTracks().forEach((track) => {
@@ -272,6 +273,7 @@
       pc.ontrack = (event) => {
         event.streams[0].getTracks().forEach((track) => {
           remoteStream.addTrack(track);
+            console.log("remoteStream:", remoteStream);
         });
 
         // Display remote video
