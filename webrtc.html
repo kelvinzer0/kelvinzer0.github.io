@@ -208,7 +208,7 @@
 
          async function createFirestoreStructure() {
       try {
-        await db.collection("calls").doc().set({});
+        await firestore.collection("calls").doc().set({});
 
         console.log("Struktur database Firestore berhasil dibuat.");
       } catch (error) {
