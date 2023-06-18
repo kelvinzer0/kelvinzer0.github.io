@@ -206,6 +206,18 @@
         }
         const firestore = firebase.firestore();
 
+         async function createFirestoreStructure() {
+      try {
+        await db.collection("calls").doc().set({});
+
+        console.log("Struktur database Firestore berhasil dibuat.");
+      } catch (error) {
+        console.error("Terjadi kesalahan dalam membuat struktur database Firestore:", error);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", createFirestoreStructure);
+
         const servers = {
             iceServers: [{
                 urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
