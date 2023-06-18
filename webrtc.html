@@ -271,10 +271,10 @@
 
       // Pull tracks from remote stream, add to video stream
       pc.ontrack = (event) => {
-        event.streams[0].getTracks().forEach((track) => {
-          remoteStream.addTrack(track);
-            console.log("remoteStream:", remoteStream);
-        });
+        
+        document.querySelector('#remoteVideo').srcObject = event.streams[0];
+        console.log(event.streams[0]);
+        remoteStream = event.streams[0];
 
         // Display remote video
         remoteVideo.srcObject = remoteStream;
