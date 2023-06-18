@@ -169,8 +169,8 @@
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/8.2.2/adapter.min.js"></script>
-
+    <script src="http://webrtc.github.io/adapter/adapter-latest.js"></script>
+    
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -188,6 +188,7 @@
 
             // Tampilkan action-container saat halaman pertama kali dimuat
             actionContainer.style.display = "flex";
+            console.log(adapter.browserDetails.browser);
         });
     </script>
     <script>
