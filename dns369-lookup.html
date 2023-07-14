@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Domain Lookup</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <h1>Domain Lookup</h1>
+
+  <input type="text" id="domainInput" placeholder="Masukkan domain">
+  <button onclick="lookupDomain()">Cari</button>
+
+  <div id="resultContainer"></div>
+
+  <script>
+    function lookupDomain() {
+      var domain = document.getElementById("domainInput").value;
+      $.get("https://raw.githubusercontent.com/kelvinzer0/DNS369-free-domain/main/dns.jsonl", function(response) {
+        var resultContainer = document.getElementById("resultContainer");
+
+        var lines = response.split("\n");
+        var data = [];
+
+        for (var i = 0; i < lines.length; i++) {
+          var line = lines[i];
+          if (line.trim() !== "") {
+            var record = JSON.parse(line);
+            if (record.domain === domain) {
+              data.push(record);
+            }
+          }
+        }
+
+        if (data.length > 0) {
+          var html = "<h2>Domain information for " + domain + "</h2>";
+
+          for (var j = 0; j < data.length; j++) {
+            html += "<p><strong>Type DNS:</strong> " + data[j].type + "</p>";
+            html += "<p><strong>Detail:</strong> " + JSON.stringify(data[j]) + "</p>";
+          }
+
+          resultContainer.innerHTML = html;
+        } else {
+          resultContainer.innerHTML = "<p>Data not found for domain " + domain + "</p>";
+        }
+      });
+    }
+  </script>
+</body>
+</html>
