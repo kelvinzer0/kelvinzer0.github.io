@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ask me! - Zerolabs Impact</title>
+     <style>
+       @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+        body, h1, h2, h3, p, div, input, button {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 40px;
+            background-color: #f9fcf9;
+            background: linear-gradient(135deg, #e2f2e455 25%, transparent 25%) -8px 0/ 16px 16px, linear-gradient(225deg, #e2f2e4 25%, transparent 25%) -8px 0/ 16px 16px, linear-gradient(315deg, #e2f2e455 25%, transparent 25%) 0px 0/ 16px 16px, linear-gradient(45deg, #e2f2e4 25%, #f9fcf9 25%) 0px 0/ 16px 16px;
+        }
+
+        /* Container for the input and button */
+        .input-container {
+
+            margin-bottom: 20px;
+        }
+
+        /* Input style */
+        input[type="text"] {
+           
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+             padding-right: 25px;
+            border: 1px solid #d6ece1;
+            border-radius: 8px;
+            outline: none;
+            font-size: 16px;
+            transition: border-color 0.3s ease-in-out;
+            width: 300px;
+            max-width: 80%;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4CAF50;
+        }
+
+        .clear-text-btn {
+    cursor: pointer;
+    position: relative;
+    font-size: 17px;
+    color: #4CAF50;
+    transition: margin-left 0.3s ease; /* Transition for the slide-in effect */
+    
+    margin-left: -30px; /* Adjusted margin to make space for the clear-text button */
+}
+
+
+  /* Style untuk tooltip */
+  .clear-text-btn::after {
+    content: "CTRL/CMD+DEL";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px 8px;
+    background-color: #4CAF50;
+    color: #fff;
+    font-size: 12px;
+    border-radius: 5px;
+    opacity: 0; /* Tooltip secara default disembunyikan */
+    transition: opacity 0.2s ease-in-out;
+    pointer-events: none; /* Agar tooltip tidak mengganggu interaksi mouse */
+  }
+
+  /* Menampilkan tooltip saat elemen hover */
+  .clear-text-btn:hover::after {
+    opacity: 1; /* Menampilkan tooltip ketika elemen hover */
+  }
+
+        /* Button style */
+        button {
+            margin: 10px;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease-in-out;
+        }
+        #sendMessage{margin-block-start:10px}
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Response style */
+        #response {
+            max-width: 800px;
+            margin: 0 auto;
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        #response p {
+            padding: 15px;
+        color: #333;
+        background-color: #f9f9f9; 
+        font-size: 18px;
+        line-height: 1.6; /* Jarak antara baris, tingkatkan keterbacaan */
+        margin-bottom: 20px; 
+        }
+        p:hover {
+        color: #000000;
+        opacity: 0.8; /* Memberikan efek transparansi saat dihover */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box !important;
+}
+
+/* Styles for code blocks with white background */
+pre[class*="language-"] {
+  position: relative !important;
+  overflow: auto !important;
+
+  /* Adding space */
+  margin: 5px 0 !important;
+  padding: 1.75rem 0 1.75rem 1rem !important;
+  border-radius: 10px !important;
+}
+
+/* Styles for the copy button inside code blocks */
+pre[class*="language-"] button {
+  position: absolute !important;
+  top: 5px !important;
+  right: 5px !important;
+
+  font-size: 0.9rem !important;
+  padding: 0.15rem !important;
+  background-color: #828282 !important;
+
+  border: ridge 1px #7b7b7c !important;
+  border-radius: 5px !important;
+  text-shadow: #c4c4c4 0 0 2px !important;
+}
+
+pre[class*="language-"] button:hover {
+  cursor: pointer !important;
+  background-color: #bcbabb !important;
+}
+
+/* Styles for main content */
+main {
+  display: grid !important;
+  max-width: 600px !important;
+  margin: 20px auto !important;
+}
+
+/* Styles for h1 */
+h1 {
+  font-size: 1.3rem !important;
+}
+
+code[class*='language-'],
+pre[class*='language-'] {
+	color: #9efeff;
+	direction: ltr;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+
+	font-family: 'Operator Mono', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	font-weight: 400;
+	font-size: 17px;
+	line-height: 25px;
+	letter-spacing: 0.5px;
+	text-shadow: 0 1px #222245;
+}
+
+pre[class*='language-']::-moz-selection,
+pre[class*='language-'] ::-moz-selection,
+code[class*='language-']::-moz-selection,
+code[class*='language-'] ::-moz-selection,
+pre[class*='language-']::selection,
+pre[class*='language-'] ::selection,
+code[class*='language-']::selection,
+code[class*='language-'] ::selection {
+	color: inherit;
+	background: #a599e9;
+}
+
+/* Code blocks. */
+pre[class*='language-'] {
+	padding: 2em;
+	margin: 0.5em 0;
+	overflow: auto;
+}
+pre[class*="language-"] > code {
+	position: relative !important;
+	display: block !important;
+}
+ pre > code { overflow-x: auto; }
+
+:not(pre) > code[class*='language-'],
+pre[class*='language-'] {
+	background: #1e1e3f;
+}
+
+/* Inline code */
+:not(pre) > code[class*='language-'] {
+	padding: 0.1em;
+	border-radius: 0.3em;
+}
+
+.token {
+	font-weight: 400;
+}
+
+.token.comment,
+.token.prolog,
+.token.cdata {
+	color: #b362ff;
+}
+
+.token.delimiter,
+.token.keyword,
+.token.selector,
+.token.important,
+.token.atrule {
+	color: #ff9d00;
+}
+
+.token.operator,
+.token.attr-name {
+	color: rgb(255, 180, 84);
+}
+
+.token.punctuation {
+	color: #ffffff;
+}
+
+.token.boolean {
+	color: rgb(255, 98, 140);
+}
+
+.token.tag,
+.token.tag .punctuation,
+.token.doctype,
+.token.builtin {
+	color: rgb(255, 157, 0);
+}
+
+.token.entity,
+.token.symbol {
+	color: #6897bb;
+}
+
+.token.number {
+	color: #ff628c;
+}
+
+.token.property,
+.token.constant,
+.token.variable {
+	color: #ff628c;
+}
+
+.token.string,
+.token.char {
+	color: #a5ff90;
+}
+
+.token.attr-value,
+.token.attr-value .punctuation {
+	color: #a5c261;
+}
+
+.token.attr-value .punctuation:first-child {
+	color: #a9b7c6;
+}
+
+.token.url {
+	color: #287bde;
+	text-decoration: underline;
+}
+
+.token.function {
+	color: rgb(250, 208, 0);
+}
+
+.token.regex {
+	background: #364135;
+}
+
+.token.bold {
+	font-weight: bold;
+}
+
+.token.italic {
+	font-style: italic;
+}
+
+.token.inserted {
+	background: #00ff00;
+}
+
+.token.deleted {
+	background: #ff000d;
+}
+
+code.language-css .token.property,
+code.language-css .token.property + .token.punctuation {
+	color: #a9b7c6;
+}
+
+code.language-css .token.id {
+	color: #ffc66d;
+}
+
+code.language-css .token.selector > .token.class,
+code.language-css .token.selector > .token.attribute,
+code.language-css .token.selector > .token.pseudo-class,
+code.language-css .token.selector > .token.pseudo-element {
+	color: #ffc66d;
+}
+
+.token.class-name {
+	color: #fb94ff;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+	background: none;
+}
+
+.line-highlight.line-highlight {
+	margin-top: 36px;
+	background: linear-gradient(to right, rgba(179, 98, 255, 0.17), transparent);
+}
+
+.line-highlight.line-highlight:before,
+.line-highlight.line-highlight[data-end]:after {
+	content: '';
+}
+
+
+
+
+
+        
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/themes/prism-tomorrow.min.css"> -->
+</head>
+<body>
+    <div class="input-container">
+        <input type="text" id="messageInput" placeholder="Type your message">
+        <span class="clear-text-btn" id="clearTextBtn" title="Clear Text" onclick="clearInput()">&#10005;</span>
+        <button id="sendMessage">Ask me!</button>
+    </div>
+    <div id="response"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/showdown@1.9.1/dist/showdown.min.js"></script>
+    <script src="./prism.js?v=2"></script>
+    <script>
+
+    </script>
+    <script>
+        const messageInput = document.getElementById("messageInput");
+        const clearTextBtn = document.getElementById("clearTextBtn");
+
+        function toggleClearBtn() {
+            clearTextBtn.style.display = messageInput.value.trim() !== "" ? "" : "none";
+        }
+
+        function clearInput() {
+            messageInput.value = "";
+            toggleClearBtn();
+        }
+
+        // Menambahkan event listener untuk memantau perubahan pada input
+        messageInput.addEventListener("input", toggleClearBtn);
+
+        // Panggil fungsi toggleClearBtn() untuk mengatur tampilan awal tombol "clear text"
+        toggleClearBtn();
+        document.addEventListener('DOMContentLoaded', function () {
+                
+        let animationInterval;
+        let button = document.getElementById('sendMessage');
+        let buttonText = "........*";
+        let isAnimating = false;
+        let isReversed = true;
+
+        document.getElementById("messageInput").addEventListener("keyup", function (event) {
+            if (event.keyCode === 13) {
+            button.click(); // Memanggil fungsi klik pada tombol submitButton
+            }
+        });
+        document.getElementById("messageInput").addEventListener("keydown", function (event) {
+            if ((event.keyCode === 46) && (event.ctrlKey || event.metaKey)) {
+            toggleClearBtn(); // Memanggil fungsi saat kombinasi tombol terdeteksi
+            }
+        });
+
+        function efekKetik(teks, kecepatan, offset) {
+            let index = offset || 0;
+            let txtH = teks.slice(0, index);
+            parseMarkdown(txtH)
+
+            function animasiKetik() {
+                if (index < teks.length) {
+                   parseMarkdown(txtH+teks.charAt(index));
+                   txtH = txtH+teks.charAt(index);
+                    index++;
+                    setTimeout(animasiKetik, kecepatan);
+                }
+            }
+
+            animasiKetik();
+        }
+
+
+
+        function getRandomCharacter() {
+        const characters = '*<>=-'+document.getElementById("messageInput").value.toLowerCase().replace("y","").replace("g","").replace("q","").replace("p","").replace("l","").replace(" ","");;
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        return characters.charAt(randomIndex);
+        }
+        function updateButtonText() {
+        if (!isReversed) {
+            buttonText = buttonText.slice(1) + buttonText[0]; // Rotate the text to the right
+        } else {
+            buttonText = buttonText.charAt(buttonText.length - 1) + buttonText.slice(0, -1); // Rotate the text to the left
+        }
+        button.textContent = buttonText.replace("*",getRandomCharacter());
+        }
+
+        // Function to start the animation
+        function startAnimation() {
+            button.disabled = true;
+        if (!isAnimating) {
+            isAnimating = true;
+            animationInterval = setInterval(updateButtonText, 200); // Change the interval here (in milliseconds)
+        }
+        }
+
+        // Function to stop the animation
+        function stopAnimation() {
+        clearInterval(animationInterval);
+        isAnimating = false;
+        button.textContent = "Ask Me!"; 
+            button.disabled = false;
+        }
+
+        // Function to reverse the animation direction
+        function reverseAnimationDirection() {
+        isReversed = !isReversed;
+        }
+
+        // Add click event listeners
+        button.addEventListener('click', () => {
+            
+        if (isAnimating) {
+            stopAnimation();
+            button.textContent = "*........"; // Reset the button text when animation stops
+        } else {
+            startAnimation();
+        }
+        });
+
+        // Add click event listener to reverse animation direction
+        button.addEventListener('dblclick', () => {
+        reverseAnimationDirection();
+        });
+
+
+            $('#sendMessage').on('click', function () {
+                console.log(isAnimating)
+                if (isAnimating) {
+                var message = $('#messageInput').val();
+                $.getJSON("https://api.ipify.org?format=json", function(data){
+                    var userIP = data.ip;
+                    sessionStorage.setItem("IP-Sec", userIP);
+                    
+                });
+                answerStream(message);
+                startAnimation();
+             }
+            });
+
+
+   
+            function parseMarkdown(datax) {
+                // Ambil data Markdown dari elemen textarea dengan ID "markdown-data"
+                var markdownData = datax;
+
+                // Buat objek showdown
+                var converter = new showdown.Converter();
+
+                // Konversi data Markdown menjadi HTML
+                var htmlContent = converter.makeHtml(markdownData);
+
+                // Tampilkan hasil parsing di dalam elemen dengan ID "parsed-content"
+                document.getElementById('response').innerHTML = htmlContent;
+            }
+
+
+        function addSuffixIfContainsSubstring(str, substring) {
+            if (str.includes(substring)) {
+                return str + '\n```';
+            } else {
+                return str;
+            }
+        }
+        function addClassToPreTags(className) {
+        const preTags = document.querySelectorAll('pre');
+
+        preTags.forEach((preTag) => {
+            preTag.classList.add(className);
+        });
+        }
+        function answerStream(message) {
+        const worker = new Worker('worker.js');
+        let lgtxt=Date.now();
+        let offset=0;
+        let fixdata="Zzz... zzz... Maaf, saya sedang tertidur, jadi semua fungsi saya sedang mati sementara. Ayo kita bicarakan lagi nanti ketika saya terjaga. Sampai jumpa!";
+        worker.onmessage = function (event) {
+            const { done, typing } = event.data;
+            const changesList = document.getElementById('response');
+
+            
+            const parsedTyping = JSON.parse(typing);
+            const data = parsedTyping['data'];
+
+            
+
+            if ((data) !== "----DONE----") {
+            let dataenc = (data);
+            fixdata =dataenc;
+            dataenc = addSuffixIfContainsSubstring(dataenc, "```");
+            efekKetik(dataenc, Date.now()-lgtxt*1000,offset);
+            lgtxt =Date.now();
+            offset=dataenc.length;
+            addClassToPreTags('line-numbers');
+            Prism.highlightAll();
+            addCopy();
+            }  else {
+            worker.terminate();
+            stopAnimation();
+            parseMarkdown(fixdata);
+            addClassToPreTags('line-numbers');
+            Prism.highlightAll();
+            addCopy();
+            }
+        };
+
+        worker.postMessage(JSON.stringify({message:message,ipsec:sessionStorage.getItem('IP-Sec')}));
+        }
+
+
+
+
+
+
+            
+        });
+    </script>
+    <script>
+addCopy();
+function addCopy() {
+    const copyButtonLabel = "Copy Code";
+let blocks = document.querySelectorAll("pre");
+
+blocks.forEach(block => {
+  // only add button if browser supports Clipboard API
+  if (navigator.clipboard) {
+    let button = document.createElement("button");
+
+    button.innerText = copyButtonLabel;
+    block.appendChild(button);
+
+    button.addEventListener("click", async () => {
+      await copyCode(block, button);
+    });
+  }
+});
+}
+
+
+async function copyCode(block, button) {
+  let code = block.querySelector("code");
+  let text = code.innerText;
+
+  await navigator.clipboard.writeText(text);
+
+  // visual feedback that task is completed
+  button.innerText = "Code Copied";
+
+  setTimeout(() => {
+    button.innerText = copyButtonLabel;
+  }, 700);
+}
+
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+</body>
+</html>
