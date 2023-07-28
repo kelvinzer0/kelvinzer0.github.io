@@ -4,7 +4,7 @@ self.onmessage = function (event) {
   const timestampStart = Date.now();
   const message = eventdata.message;
   const xhr = new XMLHttpRequest();
-  xhr.open('POST', 'https://criminalpolisheddebugmonitor--kelvin-yuliyuli.repl.co/?start_enc=true', true);
+  xhr.open('POST', 'https://criminalpolisheddebugmonitor--kelvin-yuliyuli.repl.co/', true);
   xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
   xhr.setRequestHeader('IP-Sec-ZerolabsImpact', eventdata.ipsec);
   xhr.onerror = function() {
