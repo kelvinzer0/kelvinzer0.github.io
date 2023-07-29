@@ -6,42 +6,33 @@
   <title>Play Sound from Server</title>
 </head>
 <body>
+  <label for="message">Enter Message:</label>
+  <input type="text" id="message" placeholder="Type your message here">
   <button onclick="playSoundFromServer()">Play Sound</button>
 
   <script>
     function playSoundFromServer() {
-      const responseData = {
-        "name": "speak",
-        "message": "Halo! Jika Anda tertarik untuk membuat website, berikut adalah langkah-langkah dasar untuk memulainya:"
+      const worker = new Worker("worker.js");
+
+      // Event listener to receive data from the worker
+      worker.onmessage = function(event) {
+        const audioData = event.data;
+        playAudioData(audioData);
       };
 
-      fetchAudioData(responseData)
-        .then(audioData => playAudioData(audioData))
-        .catch(error => {
-          console.error("Error fetching or playing audio:", error);
-        });
-    }
-
-    function fetchAudioData(responseData) {
-      return fetch("https://criminalpolisheddebugmonitor--kelvin-yuliyuli.repl.co", {
-        method: "POST",
-        headers: {
-          "Content-Type": "text/event-stream"
-        },
-        body: JSON.stringify(responseData)
-      })
-      .then(response => response.arrayBuffer());
+      // Send the cURL response data to the worker
+      const responseData = {
+        "name": "speak",
+        "message":  document.getElementById("message").value
+      };
+      worker.postMessage(responseData);
     }
 
     function playAudioData(audioData) {
       const blob = new Blob([audioData], { type: "audio/mpeg" });
       const audioURL = URL.createObjectURL(blob);
       const audio = new Audio(audioURL);
-
-      // Play the audio after a user interaction (button click)
-      audio.play().catch(error => {
-        console.error("Error playing audio:", error);
-      });
+      audio.play();
     }
   </script>
 </body>
