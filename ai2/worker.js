@@ -25,7 +25,7 @@ self.onmessage = function (event) {
     }
   };
 
-  const data = JSON.stringify({ "message": message, "timestamp": timestampStart});
+  const data = JSON.stringify({"name":"zeronlp", "message": message, "timestamp": timestampStart});
   xhr.send(data);
 };
 
