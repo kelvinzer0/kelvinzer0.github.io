@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Play Sound from Server</title>
+</head>
+<body>
+  <button onclick="playSoundFromServer()">Play Sound</button>
+
+  <script>
+    function playSoundFromServer() {
+      const worker = new Worker("workeraudio.js");
+
+      // Event listener to receive data from the worker
+      worker.onmessage = function(event) {
+        const audioData = event.data;
+        playAudioData(audioData);
+      };
+
+      // Send the cURL response data to the worker
+      const responseData = {
+        "name": "speak",
+        "message": "Halo! Jika Anda tertarik untuk membuat website, berikut adalah langkah-langkah dasar untuk memulainya:"
+      };
+      worker.postMessage(responseData);
+    }
+
+    function playAudioData(audioData) {
+      const blob = new Blob([audioData], { type: "audio/mpeg" });
+      const audioURL = URL.createObjectURL(blob);
+      const audio = new Audio(audioURL);
+      audio.play();
+    }
+  </script>
+</body>
+</html>
