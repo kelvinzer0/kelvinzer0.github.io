@@ -1,39 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Play Sound from Server</title>
+    <title>Menampilkan Isi Tag &lt;p&gt; saat Tombol Diklik</title>
 </head>
 <body>
-  <label for="message">Enter Message:</label>
-  <input type="text" id="message" placeholder="Type your message here">
-  <button onclick="playSoundFromServer()">Play Sound</button>
+    <div id="paragraf">
+        <p>Paragraf 1</p>
+        <p>Paragraf 2</p>
+        <p>Paragraf 3</p>
+    </div>
 
-  <script>
-    function playSoundFromServer() {
-      const worker = new Worker("workeraudio.js");
+    <script>
+        const divParagraf = document.getElementById('paragraf');
+        const paragraphs = divParagraf.getElementsByTagName('p');
+        function removeBtnFromEnd(str) {
+            if (str.endsWith("Baca")) {
+                return str.slice(0, -4);
+            } else {
+                return str;
+            }
+        }
 
-      // Event listener to receive data from the worker
-      worker.onmessage = function(event) {
-        const audioData = event.data;
-        playAudioData(audioData);
-      };
+        function playSoundFromServer(text, buttonid) {
+            const worker = new Worker("workeraudio.js");
+            worker.onmessage = function(event) {
+                const audioData = event.data;
+                playAudioData(audioData);
+            };
+            const responseData = {
+                "name": "speak",
+                "message":  text
+            };
+            worker.postMessage(responseData);
+            document.getElementById(buttonid).style.display = '';
+        }
 
-      // Send the cURL response data to the worker
-      const responseData = {
-        "name": "speak",
-        "message":  document.getElementById("message").value
-      };
-      worker.postMessage(responseData);
-    }
+        function playAudioData(audioData) {
+        const blob = new Blob([audioData], { type: "audio/mpeg" });
+        const audioURL = URL.createObjectURL(blob);
+        const audio = new Audio(audioURL);
+        audio.play();
+        }
 
-    function playAudioData(audioData) {
-      const blob = new Blob([audioData], { type: "audio/mpeg" });
-      const audioURL = URL.createObjectURL(blob);
-      const audio = new Audio(audioURL);
-      audio.play();
-    }
-  </script>
+        function ContentSpeech(paragraph, buttonid) {
+            playSoundFromServer(removeBtnFromEnd(paragraph.textContent), buttonid)
+        }
+        function addButtonToParagraph(paragraph,i) {
+            const button = document.createElement('button');
+            button.id = "button-"+i;
+            button.textContent = 'Baca';
+            button.addEventListener('click', function() {
+                button.style.display = 'none';
+                ContentSpeech(paragraph, "button-"+i);
+            });
+            paragraph.appendChild(button);
+        }
+        for (let i = 0; i < paragraphs.length; i++) {
+            addButtonToParagraph(paragraphs[i], i);
+        }
+    </script>
 </body>
 </html>
