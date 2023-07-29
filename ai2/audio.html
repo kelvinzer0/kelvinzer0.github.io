@@ -2,6 +2,28 @@
 <html>
 <head>
     <title>Menampilkan Isi Tag &lt;p&gt; saat Tombol Diklik</title>
+    <style>
+        /* Gaya untuk kelas tinybutton */
+        .tinybutton {
+            padding: 6px 12px;
+            font-size: 14px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Gaya saat tombol tinybutton dihover */
+        .tinybutton:hover {
+            background-color: #0056b3;
+        }
+
+        /* Gaya saat tombol tinybutton diaktifkan (diklik) */
+        .tinybutton:active {
+            background-color: #0041a8;
+        }
+    </style>
 </head>
 <body>
     <div id="paragraf">
@@ -26,13 +48,14 @@
             worker.onmessage = function(event) {
                 const audioData = event.data;
                 playAudioData(audioData);
+                 document.getElementById(buttonid).style.display = '';
             };
             const responseData = {
                 "name": "speak",
                 "message":  text
             };
             worker.postMessage(responseData);
-            document.getElementById(buttonid).style.display = '';
+           
         }
 
         function playAudioData(audioData) {
@@ -48,6 +71,7 @@
         function addButtonToParagraph(paragraph,i) {
             const button = document.createElement('button');
             button.id = "button-"+i;
+            button.className = "tinybutton";
             button.textContent = 'Baca';
             button.addEventListener('click', function() {
                 button.style.display = 'none';
