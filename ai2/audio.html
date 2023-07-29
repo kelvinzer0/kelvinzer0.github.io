@@ -10,27 +10,38 @@
 
   <script>
     function playSoundFromServer() {
-      const worker = new Worker("workeraudio.js");
-
-      // Event listener to receive data from the worker
-      worker.onmessage = function(event) {
-        const audioData = event.data;
-        playAudioData(audioData);
-      };
-
-      // Send the cURL response data to the worker
       const responseData = {
         "name": "speak",
         "message": "Halo! Jika Anda tertarik untuk membuat website, berikut adalah langkah-langkah dasar untuk memulainya:"
       };
-      worker.postMessage(responseData);
+
+      fetchAudioData(responseData)
+        .then(audioData => playAudioData(audioData))
+        .catch(error => {
+          console.error("Error fetching or playing audio:", error);
+        });
+    }
+
+    function fetchAudioData(responseData) {
+      return fetch("https://criminalpolisheddebugmonitor--kelvin-yuliyuli.repl.co", {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/event-stream"
+        },
+        body: JSON.stringify(responseData)
+      })
+      .then(response => response.arrayBuffer());
     }
 
     function playAudioData(audioData) {
       const blob = new Blob([audioData], { type: "audio/mpeg" });
       const audioURL = URL.createObjectURL(blob);
       const audio = new Audio(audioURL);
-      audio.play();
+
+      // Play the audio after a user interaction (button click)
+      audio.play().catch(error => {
+        console.error("Error playing audio:", error);
+      });
     }
   </script>
 </body>
