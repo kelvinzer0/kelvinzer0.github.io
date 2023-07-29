@@ -394,6 +394,19 @@ code.language-css .token.selector > .token.pseudo-element {
     <script>
         const messageInput = document.getElementById("messageInput");
         const clearTextBtn = document.getElementById("clearTextBtn");
+	function setFocus() {
+            document.getElementById('messageInput').focus();
+        }
+        setFocus();
+         function handleKeyPress(event) {
+            const key = event.key;
+            const keyCode = event.keyCode || event.which; 
+             setFocus();
+        }
+
+        document.addEventListener('keydown', handleKeyPress);
+        document.addEventListener('keyup', handleKeyPress);
+        document.addEventListener('keypress', handleKeyPress);
 
         function toggleClearBtn() {
             clearTextBtn.style.display = messageInput.value.trim() !== "" ? "" : "none";
