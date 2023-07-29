@@ -12,7 +12,7 @@
 
   <script>
     function playSoundFromServer() {
-      const worker = new Worker("worker.js");
+      const worker = new Worker("workeraudio.js");
 
       // Event listener to receive data from the worker
       worker.onmessage = function(event) {
