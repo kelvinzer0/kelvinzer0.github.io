@@ -98,6 +98,7 @@
 
         /* Response style */
         #response {
+	    display:none;
             max-width: 800px;
             margin: 0 auto;
             margin-top: 20px;
@@ -413,7 +414,6 @@ code.language-css .token.selector > .token.pseudo-element {
         const messageInput = document.getElementById("messageInput");
         const clearTextBtn = document.getElementById("clearTextBtn");
 	const divParagraf = document.getElementById('response');
-	divParagraf.style.display = 'none';
         const paragraphs = divParagraf.getElementsByTagName('p');
         function removeBtnFromEnd(str) {
             if (str.endsWith("Baca")) {
