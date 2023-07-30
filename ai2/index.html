@@ -412,7 +412,8 @@ code.language-css .token.selector > .token.pseudo-element {
     <script>
         const messageInput = document.getElementById("messageInput");
         const clearTextBtn = document.getElementById("clearTextBtn");
-	 const divParagraf = document.getElementById('response');
+	const divParagraf = document.getElementById('response');
+	divParagraf.style.display = 'none';
         const paragraphs = divParagraf.getElementsByTagName('p');
         function removeBtnFromEnd(str) {
             if (str.endsWith("Baca")) {
@@ -629,6 +630,7 @@ code.language-css .token.selector > .token.pseudo-element {
         let offset=0;
         let fixdata="Zzz... zzz... Maaf, saya sedang tertidur, jadi semua fungsi saya sedang mati sementara. Ayo kita bicarakan lagi nanti ketika saya terjaga. Sampai jumpa!";
         worker.onmessage = function (event) {
+	    divParagraf.style.display = '';
             const { done, typing } = event.data;
             const changesList = document.getElementById('response');
 
