@@ -471,6 +471,13 @@ code.language-css .token.selector > .token.pseudo-element {
             const key = event.key;
             const keyCode = event.keyCode || event.which; 
             if ((key === "Meta" || key === "Control") || (keyCode === 91 || keyCode === 93 || keyCode === 17)) {
+	        // If CMD+C (or CTRL+C) for copying, allow the default behavior
+	        if ((key === "c" || key === "C") && event.ctrlKey) {
+	            return;
+	        }
+	        
+	        // Prevent other CMD (Meta) or CTRL key functionality
+	        event.preventDefault();
 	        return;
 	    }
 
