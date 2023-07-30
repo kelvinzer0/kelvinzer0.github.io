@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Ask me! - Zerolabs Impact</title>
      <style>
        @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+	*{
+            -webkit-tap-highlight-color:transparent;
+        }
         body, h1, h2, h3, p, div, input, button {
             font-family: 'Poppins', sans-serif;
             margin: 0;
@@ -467,6 +470,10 @@ code.language-css .token.selector > .token.pseudo-element {
          function handleKeyPress(event) {
             const key = event.key;
             const keyCode = event.keyCode || event.which; 
+            if ((key === "Meta" || key === "Control") || (keyCode === 91 || keyCode === 93 || keyCode === 17)) {
+	        return;
+	    }
+
              setFocus();
         }
 
@@ -630,7 +637,7 @@ code.language-css .token.selector > .token.pseudo-element {
         let offset=0;
         let fixdata="Zzz... zzz... Maaf, saya sedang tertidur, jadi semua fungsi saya sedang mati sementara. Ayo kita bicarakan lagi nanti ketika saya terjaga. Sampai jumpa!";
         worker.onmessage = function (event) {
-	    divParagraf.style.display = '';
+	    divParagraf.style.display = 'block';
             const { done, typing } = event.data;
             const changesList = document.getElementById('response');
 
