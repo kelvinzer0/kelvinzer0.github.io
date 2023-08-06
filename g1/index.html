@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>KZ Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #292a2b;
+}
+
+.snake {
+    background-color: black;
+    fill: white;
+    stroke: black;
+    strokeWidth: 2px;
+}
+
+.apple {
+    fill: red;
+    strokeWidth: 0;
+}
+
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<script>
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var scale = window.devicePixelRatio || 1; // Ambil nilai skala DPR
+
+function setCanvasSize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+
+var snake;
+var apple;
+var dir;
+var gameOver;
+var gameSpeed = 160; // Adjust this to control the game speed (lower value means faster)
+var score = 0;
+var time = 0;
+
+function startGame() {
+   snake = [
+        { x: 100, y: 100 },
+        { x: 90, y: 100 },
+        { x: 80, y: 100 }
+    ];
+    apple = {
+        x: Math.floor(Math.random() * (canvas.width / 10)) * 10,
+        y: Math.floor(Math.random() * (canvas.height / 10)) * 10
+    };
+    dir = "right";
+    gameOver = false;
+    draw();
+}
+
+function updateScore() {
+    ctx.fillStyle = "white";
+    ctx.font = "20px Arial";
+    ctx.fillText("Score: " + score, 10, 30);
+}
+
+function updateTime() {
+    ctx.fillStyle = "white";
+    ctx.font = "20px Arial";
+    ctx.fillText("Time: " + time + " seconds", 10, 60);
+}
+
+function update() {
+    var newHead = { x: snake[0].x, y: snake[0].y };
+
+    switch (dir) {
+        case "up":
+            newHead.y -= 10;
+            break;
+        case "down":
+            newHead.y += 10;
+            break;
+        case "left":
+            newHead.x -= 10;
+            break;
+        case "right":
+            newHead.x += 10;
+            break;
+    }
+
+    // Deteksi jika ular "memakan" apel
+    if (newHead.x === apple.x && newHead.y === apple.y) {
+        score++;
+        apple.x = Math.floor(Math.random() * (canvas.width / 10)) * 10;
+        apple.y = Math.floor(Math.random() * (canvas.height / 10)) * 10;
+    } else {
+        // Jika tidak memakan apel, hapus elemen terakhir ular
+        snake.pop();
+    }
+
+    snake.unshift(newHead);
+
+    for (var i = 1; i < snake.length; i++) {
+        if (snake[0].x === snake[i].x && snake[0].y === snake[i].y) {
+            gameOver = true;
+            score = 0;
+            time = 0;
+            break;
+        }
+    }
+
+    if (snake[0].x < 0 || snake[0].x >= canvas.width || snake[0].y < 0 || snake[0].y >= canvas.height) {
+        gameOver = true;
+        score = 0;
+        time = 0;
+    }
+}
+
+function draw() {
+    if (gameOver) {
+        alert("Game Over!");
+        startGame();
+        return;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    var headImg = new Image();
+    switch (dir) {
+        case "up":
+            headImg.src = 'me-up.png';
+            break;
+        case "down":
+            headImg.src = 'me-down.png';
+            break;
+        case "left":
+            headImg.src = 'me-left.png';
+            break;
+        case "right":
+            headImg.src = 'me-right.png';
+            break;
+    }
+    
+    headImg.onload = function() {
+        ctx.drawImage(headImg, snake[0].x, snake[0].y, 20, 20);
+    };
+    var bodyImg = new Image();
+    bodyImg.src = 'kisspng-hamburger-bacon-sushi-pizza-cheeseburger-burger-king-5ab6e57493c515.4236508615219357326053.png'; // Ganti 'path_to_body_image' dengan path gambar badan ular yang sebenarnya
+
+    var tailImg = new Image();
+    tailImg.src = 'kisspng-hamburger-bacon-sushi-pizza-cheeseburger-burger-king-5ab6e57493c515.4236508615219357326053.png'; // Ganti 'path_to_tail_image' dengan path gambar ekor ular yang sebenarnya
+
+    headImg.onload = function() {
+        ctx.drawImage(headImg, snake[0].x, snake[0].y, 20, 20);
+    };
+
+    for (var i = 1; i < snake.length - 1; i++) {
+        ctx.drawImage(bodyImg, snake[i].x, snake[i].y, 20, 20);
+    }
+
+    tailImg.onload = function() {
+        ctx.drawImage(tailImg, snake[snake.length - 1].x, snake[snake.length - 1].y, 20, 20);
+    };
+
+
+    // for (var i = 0; i < snake.length; i++) {
+    //     ctx.fillStyle = "white";
+    //     ctx.fillRect(snake[i].x, snake[i].y, 20, 20);
+    // }
+
+    // ctx.fillStyle = "red";
+    // ctx.fillRect(apple.x, apple.y, 20, 20);
+    var appleImg = new Image();
+    // Set the source of the image (replace 'path_to_apple_image' with the actual path to your apple image)
+    appleImg.src = 'kisspng-hamburger-bacon-sushi-pizza-cheeseburger-burger-king-5ab6e57493c515.4236508615219357326053.png';
+
+    // Draw the image when it's loaded
+    appleImg.onload = function() {
+        ctx.drawImage(appleImg, apple.x, apple.y, 20, 20);
+    };
+    updateScore();
+    updateTime();
+    update();
+    time++;
+
+    setTimeout(draw, gameSpeed);
+}
+
+document.addEventListener("keydown", function(event) {
+    const keyCode = event.keyCode || event.which; // Handle cross-browser compatibility
+
+    switch (keyCode) {
+        case 38: // up arrow
+            if (dir !== "down") dir = "up";
+            break;
+        case 40: // down arrow
+            if (dir !== "up") dir = "down";
+            break;
+        case 37: // left arrow
+            if (dir !== "right") dir = "left";
+            break;
+        case 39: // right arrow
+            if (dir !== "left") dir = "right";
+            break;
+    }
+});
+
+// Alternatif pendekatan yang lebih modern (tanpa menggunakan event.keyCode):
+// Function to handle key events for desktop
+function handleKeyDown(event) {
+    switch (event.keyCode) {
+        case 38: // up arrow
+            if (dir !== "down") dir = "up";
+            break;
+        case 40: // down arrow
+            if (dir !== "up") dir = "down";
+            break;
+        case 37: // left arrow
+            if (dir !== "right") dir = "left";
+            break;
+        case 39: // right arrow
+            if (dir !== "left") dir = "right";
+            break;
+    }
+}
+
+// Function to handle touch events for mobile
+function handleTouchStart(event) {
+    const touchY = event.touches[0].clientY;
+    const touchX = event.touches[0].clientX;
+    const { top, bottom, left, right } = event.target.getBoundingClientRect();
+
+    const isVerticalSwipe = Math.abs(touchY - (top + bottom) / 2) > Math.abs(touchX - (left + right) / 2);
+
+    if (isVerticalSwipe) {
+        if (touchY < (top + bottom) / 2 && dir !== "down") {
+            dir = "up";
+        } else if (touchY >= (top + bottom) / 2 && dir !== "up") {
+            dir = "down";
+        }
+    } else {
+        if (touchX < (left + right) / 2 && dir !== "right") {
+            dir = "left";
+        } else if (touchX >= (left + right) / 2 && dir !== "left") {
+            dir = "right";
+        }
+    }
+}
+
+// Event listener for desktop keydown
+document.addEventListener("keydown", handleKeyDown);
+
+// Event listener for mobile touchstart
+document.addEventListener("touchstart", handleTouchStart);
+
+setCanvasSize();
+window.addEventListener("resize", setCanvasSize);
+startGame();
+
+</script>
+</body>
+</html>
