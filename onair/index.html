@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Radio Jawa - On Air</title>
+  <style>
+     body {
+      padding: 0;
+      margin: 0;
+      display: flex;
+    
+      align-items: center;
+      background: white;
+    }
+
+
+
+#play-ok, #stop-ok {
+  border: none;
+  padding: 12px 20px;
+  margin: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+#play-ok {
+  background-color: #2ecc71;
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#stop-ok {
+  background-color: #e74c3c;
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.buttonaarea{
+    text-align: left;
+    align-items: left;
+    position: relative;
+    margin: 10px;
+}
+
+
+
+    canvas {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: -1; /* Move the canvas behind other elements */
+    }
+  </style>
+  </style>
+</head>
+<body translate="no">
+    <div class="buttonaarea">
+        <button id="play-ok">
+            Play Stream
+        </button>
+        <button id="stop-ok">
+            Stop Listen
+        </button>
+    </div>
+
+
+<script>
+   
+    (function () {
+  var AudioAnalyser = function (_audio)
+  {
+    // Store `this` for use in inner scopes
+    var _this = this;
+    var numBands, smoothing, muted;
+    var context, jsNode, analyser, source;
+    var isInitialized;
+
+    /**
+     * Initializer
+     */
+    function init(_numBands, _smoothing, _muted)
+    {
+      // Set the local variables / settings
+      _this.audio = _audio != null ? _audio : new Audio();
+
+      numBands = _numBands != null ? _numBands : 32;
+      smoothing = _smoothing != null ? _smoothing : 0.1;
+      muted = _muted != null ? _muted : false;
+
+      // Check if an audio object is given, otherwise make one from the source string
+      if (typeof _this.audio === 'string') {
+        var src = _this.audio;
+
+        _this.audio = new Audio();
+        _this.audio.crossOrigin = 'anonymous';
+        _this.audio.controls = true;
+        _this.audio.src = src;
+        _this.audio.preload = "none";
+      }
+
+      // Create the AudioContext
+      context = new AudioAnalyser.AudioContext();
+
+      // Create the ScriptProcessor
+      jsNode = context.createScriptProcessor(1024, 1, 1);
+
+      // Create the Context's Analyser
+      analyser = context.createAnalyser();
+      analyser.smoothingTimeConstant = smoothing;
+      analyser.fftSize = numBands * 2;
+
+      isInitialized = false;
+
+      // Allocate a new Unsigned int8 array
+      _this.bands = new Uint8Array(analyser.frequencyBinCount);
+      _this.freq = analyser.frequencyBinCount;
+
+      // Add eventlistener for the 'play' event, gets fired once enough data is buffered
+      // to play the stream / tune.
+      _this.audio.addEventListener('play', ready, false);
+    }
+
+    /**
+     * Called when the audio is ready to play
+     */
+    function ready()
+    {
+      if (isInitialized) {
+        return;
+      }
+
+      // Create media element from source
+      source = context.createMediaElementSource(_this.audio);
+
+      // Connect the analyser to the source
+      source.connect(analyser);
+
+      // Connect the jsNode to the analyser
+      analyser.connect(jsNode);
+
+      // Connect the destination to the jsNode
+      jsNode.connect(context.destination);
+
+      // Check if the sound should be playing
+      if (!muted) {
+        // Connect the destination to the audio source
+        source.connect(context.destination);
+      }
+
+      // Call the processAudio() function
+      jsNode.onaudioprocess = processAudio;
+
+      isInitialized = true;
+    }
+
+    /**
+     * Called whenever there is new FFT data available
+     */
+    function processAudio(e)
+    {
+      analyser.getByteFrequencyData(_this.bands);
+
+      var out = e.outputBuffer.getChannelData(0);
+      var int = e.inputBuffer.getChannelData(0);
+      var max = 0;
+
+      for (var i = 0; i < int.length; i++) {
+        out[i] = 0; // prevent feedback + we only need the input data
+        max = int[i] > max ? int[i] : max;
+      }
+
+      // set the energy value
+      _this.energy = max;
+
+      //convert from magnitude to decibel
+      _this.decibels = 20 * Math.log(Math.max(max, Math.pow(10, -72 / 20))) / Math.LN10;
+
+      if (!_this.audio.paused) {
+        if (_this.onUpdate != null && typeof _this.onUpdate === 'function') {
+          _this.onUpdate(_this.bands, _this.decibels, _this.energy); // call the onUpdate method
+        }
+      }
+    }
+
+    // Finally, start the init method
+    init();
+  };
+
+  /**
+   * Start method
+   */
+  AudioAnalyser.prototype.start = function () {
+    return this.audio.play();
+  };
+
+  /**
+   * Stop method
+   */
+  AudioAnalyser.prototype.stop = function () {
+    return this.audio.pause();
+  };
+
+  // Set the AudioContext, if that's not found, try the (deprecated) webkitAudioContext
+  AudioAnalyser.AudioContext = window.AudioContext || window.webkitAudioContext;
+
+  // If the AudioAnalyser is enabled / working.
+  AudioAnalyser.enabled = AudioAnalyser.AudioContext != null;
+
+  // Make the AudioAnalyser globally available
+  window.AudioAnalyser = AudioAnalyser;
+})();
+
+(function () {
+  window.Analyser = function (_audioElem) {
+    this.numOfBands = 12;
+    this.smoothing = 0.3;
+
+    var beforeInputInterval;
+    var beforeInputTimeout = 16; // +/- 60 fps
+    var tempCounter = 0;
+    var tempFrequency = 15;
+    var tempAmplitude = 0.6;
+
+    var analyser;
+    var _this = this;
+
+    // Sets everything up
+    this.init = function (_numOfBands, _smoothing)
+    {
+      // The source of the mp3 stream, an html5 audio element or the path to the strema.
+      var source;
+
+      if (!_audioElem) {
+        source = 'https://shaincast.caster.fm:34499/listen.mp3?authnea19013b1f85eb2702bda60d10dff403';
+      } else {
+        source = _audioElem;
+      }
+
+      // The number of bands to read
+      _this.numOfBands = _numOfBands != null ? _numOfBands : 32;
+
+      // The amount of smoothing to use
+      _this.smoothing = _smoothing != null ? _smoothing : 0.3;
+
+      // Allocate a new AudioAnalyser, give the mp3/path, number of bands and the smoothing as arguments
+      analyser = new AudioAnalyser(source, _this.numOfBands, _this.smoothing);
+
+      // Listen to the onUpdate event
+      analyser.onUpdate = function (_bands, _decibels, _energy, _freq=null) {
+        if (beforeInputInterval != null) {
+          clearInterval(beforeInputInterval);
+
+          beforeInputInterval = null;
+        }
+
+        // set the global bands variable to the newly received bands
+        Analyser.bands = _bands;
+         Analyser.freq = _freq;
+
+        // set the global decibels variable to the newly received db's
+        Analyser.decibels = _decibels;
+
+        // set the energy value
+        Analyser.energy = _energy;
+
+        if (_energy == 0) {
+          createTempData();
+        }
+
+        // call the onUpdate method, if it exists
+        if (_this.onUpdate != null && typeof _this.onUpdate === 'function') {
+          _this.onUpdate(_bands, _decibels, Analyser.energy, _freq); // call the onUpdate method
+        }
+      };
+    };
+
+    function createTempData()
+    {
+      tempCounter++;
+
+      Analyser.energy = Math.sin(tempCounter / tempFrequency) * tempAmplitude;
+
+      for (var i = 0; i < Analyser.bands.length; i++) {
+        Analyser.bands[i] = Math.sin((i + tempCounter) / tempFrequency) * (Math.random() * 255);
+      }
+    }
+
+    /**
+     * Call to start the analyser
+     */
+    this.start = function () {
+      // Start the AudioAnalyser
+      analyser.start();
+
+      // Start the timer for the temporary visuals / input
+      beforeInputInterval = setInterval(createTempData, beforeInputTimeout);
+    };
+
+    /**
+     * Call to stop the analyser
+     */
+    this.stop = function () {
+      // Start the AudioAnalyser
+      analyser.stop();
+    };
+  };
+
+  Analyser.bands = [];
+  Analyser.freq = 0;
+  Analyser.decibels = 0;
+  Analyser.energy = 0;
+})();
+
+(function () {
+  var calc = function () {
+    this.map = function (value, low1, high1, low2, high2)
+    {
+      return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+    };
+  };
+
+  window.Calc = new calc();
+})();
+
+
+</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script>
+   
+    var numOfBands = 7; // Ubah sesuai preferensi Anda
+    var smoothing = 10; // Ubah sesuai preferensi Anda
+    var analyser = new Analyser();
+    analyser.init(numOfBands, smoothing);
+
+    var audio;
+    var analyzer;
+    var data = [];
+    var maxData;
+    var logo;
+    // window.addEventListener('load', function() {
+    //     audio = document.getElementById('audioPlayer');
+    //     audio.play();
+    //   });
+
+    var bgParticles = []; // Partikel latar belakang
+    var numBgParticles = 100; // Jumlah partikel latar belakang
+
+    function preload() {
+      // Memuat gambar logo sebelum kanvas dibuat
+      logo = loadImage('Vector.svg'); // Ganti path sesuai dengan path gambar SVG Anda
+    }
+
+    function setup() {
+      createCanvas(windowWidth, windowHeight); 
+      angleMode(DEGREES);
+      rectMode(BOTTOM);
+
+  
+
+      for (var i = 0; i < 100; i = i + 1) {
+        var randomNumber = random(20, 80);
+        data.push(randomNumber);
+      }
+      maxData = max(data);
+
+      // Inisialisasi partikel latar belakang
+      for (var i = 0; i < numBgParticles; i++) {
+        bgParticles.push(new BgParticle());
+      }
+
+    analyser.start();
+      
+    }
+
+    
+
+   
+let rotationSpeed = 0.02; // Kecepatan putaran balon
+
+function draw() {
+  // Animasi latar belakang
+  background(0, 0, 0, 50); 
+  for (var i = 0; i < numBgParticles; i++) {
+    bgParticles[i].move();
+    bgParticles[i].display();
+  }
+  noStroke();
+
+  var angleSeparation = 360 / data.length;
+  var padding = 10;
+
+  var dataArray = Analyser.bands;
+  var calx = Analyser.energy/200;
+  rotationSpeed = calx < 0 ? 0 : calx;
+//   console.log(rotationSpeed)
+  
+  
+    // rotationSpeed = Analyser.energy;
+  
+ 
+//   console.log();
+  var offset = 200;
+  var dataMultiplier = (height / 2 - offset - padding) / maxData;
+
+  for (var i = 0; i < data.length; i++) {
+    var currentData = data[i];
+    var finalHeight = currentData * dataMultiplier;
+    var animatedHeight = map(dataArray[i], 0, 255, 0, finalHeight);
+
+    push();
+    translate(width / 2, height / 2);
+
+    // Menggunakan waktu sebagai variabel untuk rotasi
+    rotate(angleSeparation * i + millis() * rotationSpeed);
+
+    // Create a gradient based on amplitude data
+    var fromColor = color(0, 128, 0, 100); // Warna hijau tua
+    var toColor = color(0, 255, 0, 100); // Warna hijau terang
+    var lerpedColor = lerpColor(fromColor, toColor, dataArray[i] / 255);
+    fill(lerpedColor);
+
+    // Draw a circular shape instead of a rectangle
+    var diameter = map(animatedHeight, 0, finalHeight, 10, 100);
+    ellipse(0, offset, diameter, diameter);
+
+    // Add animated particles
+    var particleRadius = 2;
+    var particleX = cos(radians(angleSeparation * i + millis() * rotationSpeed)) * (offset + animatedHeight - particleRadius);
+    var particleY = sin(radians(angleSeparation * i + millis() * rotationSpeed)) * (offset + animatedHeight - particleRadius);
+    ellipse(particleX, particleY, particleRadius, particleRadius);
+
+    pop();
+  }
+   // Menempatkan logo di tengah kanvas
+  imageMode(CENTER);
+  image(logo, width / 2, height / 2);
+}
+
+
+
+
+    // Definisikan kelas BgParticle untuk partikel latar belakang
+    function BgParticle() {
+      this.x = random(width);
+      this.y = random(height);
+      this.speedX = random(-1, 1);
+      this.speedY = random(-1, 1);
+      this.radius = random(2, 8);
+
+      this.move = function() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        // Memastikan partikel tetap berada dalam batas kanvas
+        if (this.x < 0 || this.x > width) {
+          this.speedX *= -1;
+        }
+        if (this.y < 0 || this.y > height) {
+          this.speedY *= -1;
+        }
+      };
+
+      this.display = function() {
+        fill(255, 255, 255, 50); // Warna putih dengan transparansi
+        ellipse(this.x, this.y, this.radius, this.radius);
+      };
+    }
+    function onPageLoaded() {
+            console.log('DOM content loaded.');
+            const pok = document.getElementById('play-ok');
+            const sok = document.getElementById('stop-ok');
+
+            sok.addEventListener('click', function () {
+                setTimeout(function() {
+                 analyser.stop();
+                }, 2000);
+            });
+            pok.addEventListener('click', function () {
+                
+                setTimeout(function() {
+                analyser.start();
+                }, 2000);
+            });
+        }
+
+        
+        document.addEventListener('DOMContentLoaded', onPageLoaded);
+  </script>
+</body>
+</html>
