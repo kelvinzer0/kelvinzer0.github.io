@@ -15,4 +15,4 @@
 Test on client
 1. Install tor first
 2. Test
-curl --proxy socks5h://localhost:9050 http://onionsie
+curl --proxy socks5h://localhost:9050 http://onionyoursite
