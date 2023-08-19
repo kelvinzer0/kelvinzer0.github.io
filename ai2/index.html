@@ -413,7 +413,12 @@ code.language-css .token.selector > .token.pseudo-element {
 
 
 
-
+.logo {
+    max-width:230px; /* Ensure the logo doesn't exceed its container's width */
+    height: auto;    /* Maintain the logo's aspect ratio */
+    display: block;  /* Remove any extra spacing around the image */
+    margin: 0 auto;  /* Center the logo horizontally */
+}
         
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" />
@@ -421,6 +426,7 @@ code.language-css .token.selector > .token.pseudo-element {
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/themes/prism-tomorrow.min.css"> -->
 </head>
 <body>
+    <img src="zeronlp.svg" alt="Zerolabs Impact Logo" class="logo" id="logo">
     <div class="input-container">
         <input type="text" id="messageInput" placeholder="Type your message">
         <span class="clear-text-btn" id="clearTextBtn" title="Clear Text" onclick="clearInput()">&#10005;</span>
@@ -453,6 +459,7 @@ code.language-css .token.selector > .token.pseudo-element {
                 const audioData = event.data;
                 playAudioData(audioData);
                  document.getElementById(buttonid).style.display = '';
+
             };
             const responseData = {
                 "name": "speak",
@@ -694,6 +701,7 @@ code.language-css .token.selector > .token.pseudo-element {
 	        addButtonToParagraph(paragraphs[i], i);
 	    }
 	    divParagraf.style.display = 'block';
+        document.getElementById("logo").style.display = 'none';
             addCopy();
             }
         };
