@@ -1,0 +1,5 @@
+Server:
+https://github.com/norpol/opensshd-tor-easy-setup
+
+Client:
+ssh -o ProxyCommand="nc -X 5 -x localhost:9050 %h %p" username@remote_host
