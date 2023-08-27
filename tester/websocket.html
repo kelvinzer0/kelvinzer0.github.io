@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Tester</title>
+</head>
+<body>
+    <h1>WebSocket Tester</h1>
+    <form id="websocketForm">
+        <label for="serverUrl">URL Server WebSocket:</label>
+        <input type="text" id="serverUrl" value="ws://localhost:8080/ws" required>
+        <button type="button" onclick="connectWebSocket()">Hubungkan</button>
+        <button type="button" onclick="disconnectWebSocket()">Putuskan</button>
+    </form>
+    <div id="log" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc; max-height: 300px; overflow-y: auto;"></div>
+
+    <script>
+        let socket;
+
+        function log(message) {
+            const logElement = document.getElementById('log');
+            logElement.innerHTML += `<p>${message}</p>`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function connectWebSocket() {
+            const serverUrl = document.getElementById('serverUrl').value;
+            socket = new WebSocket(serverUrl);
+
+            socket.onopen = function(event) {
+                log('Koneksi terbuka.');
+            };
+
+            socket.onmessage = function(event) {
+                log(`Pesan masuk: ${event.data}`);
+            };
+
+            socket.onclose = function(event) {
+                if (event.wasClean) {
+                    log(`Koneksi ditutup dengan kode: ${event.code} dan alasan: ${event.reason}`);
+                } else {
+                    log('Koneksi terputus secara tidak terduga.');
+                }
+            };
+
+            socket.onerror = function(error) {
+                log(`Terjadi kesalahan: ${error.message}`);
+            };
+        }
+
+        function disconnectWebSocket() {
+            if (socket) {
+                socket.close();
+                log('Koneksi ditutup.');
+            }
+        }
+    </script>
+</body>
+</html>
