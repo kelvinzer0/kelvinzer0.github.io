@@ -1,0 +1,5 @@
+https://github.com/kelvinzer0/kelvinzer0.github.io/raw/main/rtools/netiface
+
+output:
+Name: eth0, MAC: xx:xx:xx:xx:xx:xx, IP: [xxx.xxx.xxx.xxx xxxx::xxx:xxxx:xxxx:xxxx]
+Name: eth1, MAC: xx:xx:xx:xx:xx:xx, IP: [xxxx::xxx:xxxx:xxxx:xxxx]
