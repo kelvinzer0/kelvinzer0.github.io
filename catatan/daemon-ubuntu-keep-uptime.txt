@@ -1,0 +1,3 @@
+
+echo 'eth0' > iface.txt && echo '10' > comp.txt 
+./uptime-running > /dev/null &
