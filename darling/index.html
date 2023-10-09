@@ -1,1 +1,459 @@
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>My Love - Happy Birthday</title>
+
+    <link rel="canonical" href="https://codepen.io/arcs/pen/XKKYZW">
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:900">
+  
+<style>
+    *
+{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#musicarea
+{
+    position: absolute;
+top: 25vh;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+.player
+{
+    max-width: 250px;
+  width: 80%;
+  background: #fff;
+/*   margin: 100px; */
+  padding: 20px 14px 8px 14px;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 10px 2px 90px -11px rgba(13,100,76,0.75);
+  -webkit-box-shadow: 10px 2px 90px -11px rgba(13,100,76,0.75);
+  -moz-box-shadow: 10px 2px 90px -11px rgba(13,100,76,0.75);
+}
+
+.slider-container {
+  overflow: hidden;
+  width: 80%;
+  max-width: 800px;
+  position: relative;
+}
+
+.imgBx {
+  width: 100%;
+  height: auto;
+  border: none;
+  border-radius: 10px;
+  display: none;
+}
+
+.imgBx img {
+  width: 100%;
+  height: auto;
+}
+
+.player audio
+{
+  width: 100%;
+  border-radius: 6px;
+  margin: 0;
+  padding: 0;
+  margin-top: 10px;
+  border: none;
+}
+
+        body {
+            margin: 0;
+            background: #020202;
+            cursor: crosshair;
+        }
+        canvas {
+            display: block;
+        }
+        h1 {
+        
+            top: 15vh;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            margin-top: 10vh;
+            font-family: "Source Sans Pro", Arial, sans-serif; /* Gunakan font backup jika font utama tidak tersedia */
+            font-size: 24px; /* Ukuran font responsif berdasarkan viewport width */
+            font-weight: 900;
+            color: #fff;
+            text-align: center; /* Pusatkan teks h1 */
+            background-color: rgba(0, 0, 0, 0.3); /* Latar belakang teks dengan transparansi */
+            padding: 10px 20px; /* Padding agar lebih mudah dibaca */
+            border-radius: 10px; /* Sudut bulat untuk elemen */
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        p.subtitle {
+            
+            top: 15vh;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            font-family: "Source Sans Pro", Arial, sans-serif;
+            font-size: 16px; /* Sesuaikan ukuran font sesuai kebutuhan */
+            font-weight: 400;
+            color: #fff;
+            text-align: center;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+         /* Styling untuk latar belakang semi-transparan */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Latar belakang semi-transparan */
+            z-index: 1;
+        }
+
+        /* Styling untuk modal */
+        .modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    border-radius: 15px; /* Sudut radius 15px */
+    padding: 15px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+}
+
+/* Media query untuk perangkat berukuran kecil */
+@media (max-width: 768px) {
+    .modal {
+        width: 80%; /* Lebar modal untuk perangkat kecil */
+    }
+}
+
+      
+        /* Styling untuk teks dalam modal */
+        .modal-content {
+            padding: 8px;
+        }
+
+        .subheading {
+          font-family: "Source Sans Pro", Arial, sans-serif; 
+            font-size: 18px; /* Ukuran font subheading */
+            font-weight: bold; /* Teks tebal */
+            margin-bottom: 10px; /* Jarak bawah */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            -webkit-hyphens: auto;
+            hyphens: auto;
+        }
+        /* Styling untuk tombol OK */
+        .ok-button {
+            display: block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #020202;
+            color: #fff;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            float: right; /* Pindahkan tombol ke kanan */
+        }
+
+        /* Hover state untuk tombol OK */
+        .ok-button:hover {
+            background-color: #3f3f3f;
+        }
+    </style>
+
+  
+  
+</head>
+
+<body translate="no">
+  <div id="xar" style="display: none;">
+  <h1>Happy Birthday</h1>
+  <p class="subtitle">- MY LOVE -</p>
+<canvas id="birthday" width="362" height="536"></canvas>
+<center>
+
+<div id="musicarea">
+  <div class="player">
+    <div class="slider-container">
+      <div class="imgBx">
+        <img src="http://kelvinzer0.github.io/darling/loves/1.jpeg" alt="My Love">
+      </div>
+      <div class="imgBx">
+        <img src="http://kelvinzer0.github.io/darling/loves/2.jpeg" alt="My Love">
+      </div>
+      <div class="imgBx">
+        <img src="http://kelvinzer0.github.io/darling/loves/3.jpeg" alt="My Love">
+      </div>
+      <div class="imgBx">
+        <img src="http://kelvinzer0.github.io/darling/loves/4.jpeg" alt="My Love">
+      </div>
+      <div class="imgBx">
+        <img src="http://kelvinzer0.github.io/darling/loves/5.jpeg" alt="My Love">
+      </div>
+      <div class="imgBx">
+        <img src="http://kelvinzer0.github.io/darling/loves/6.jpeg" alt="My Love">
+      </div>
+      <div class="imgBx">
+        <img src="http://kelvinzer0.github.io/darling/loves/7.jpeg" alt="My Love">
+      </div>
+      <div class="imgBx">
+        <img src="http://kelvinzer0.github.io/darling/loves/8.jpeg" alt="My Love">
+      </div>
+      <div class="imgBx">
+        <img src="http://kelvinzer0.github.io/darling/loves/9.jpeg" alt="My Love">
+      </div>
+      <div class="imgBx">
+        <img src="http://kelvinzer0.github.io/darling/loves/10.jpeg" alt="My Love">
+      </div>
+      <div class="imgBx">
+        <img src="http://kelvinzer0.github.io/darling/loves/11.jpeg" alt="My Love">
+      </div>
+      <div class="imgBx">
+        <img src="http://kelvinzer0.github.io/darling/loves/12.jpeg" alt="My Love">
+      </div>
+      <!-- Tambahkan gambar-gambar lain di sini -->
+    </div>
+    <audio controls>
+      <source src="https://kelvinzer0.github.io/darling/lagu_kesetiaan_takkan_terganti.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+</div>
+    
+</center>
+</div>
+  <div class="overlay" id="overlay"></div>
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <p  class="subheading">Cinta kita seperti lagu yang takkan terganti, indah, suci dan abadi.</p>
+            <button class="ok-button" onclick="closeModal()">>>></button>
+        </div>
+    </div>
+
+  
+      <script id="rendered-js">
+         openModal();
+        function openModal() {
+           
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function closeModal() {
+          document.getElementById('xar').style.display = 'block';
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('modal').style.display = 'none';
+        }
+
+       const images = document.querySelectorAll('.imgBx');
+let currentIndex = 0;
+
+function showImage(index) {
+  images.forEach((img, i) => {
+    if (i === index) {
+      img.style.display = 'block';
+    } else {
+      img.style.display = 'none';
+    }
+  });
+}
+
+function nextImage() {
+  currentIndex = (currentIndex + 1) % images.length;
+  showImage(currentIndex);
+}
+
+// Tambahkan event listener untuk animasi slide
+setInterval(nextImage, 3000); // Ganti gambar setiap 3 detik
+
+// Tampilkan gambar pertama saat halaman dimuat
+showImage(currentIndex);
+
+// helper functions
+const PI2 = Math.PI * 2;
+const random = (min, max) => Math.random() * (max - min + 1) + min | 0;
+const timestamp = _ => new Date().getTime();
+
+// container
+class Birthday {
+  constructor() {
+    this.resize();
+
+    // create a lovely place to store the firework
+    this.fireworks = [];
+    this.counter = 0;
+
+  }
+
+  resize() {
+    this.width = canvas.width = window.innerWidth;
+    let center = this.width / 2 | 0;
+    this.spawnA = center - center / 4 | 0;
+    this.spawnB = center + center / 4 | 0;
+
+    this.height = canvas.height = window.innerHeight;
+    this.spawnC = this.height * .1;
+    this.spawnD = this.height * .5;
+
+  }
+
+  onClick(evt) {
+    let x = evt.clientX || evt.touches && evt.touches[0].pageX;
+    let y = evt.clientY || evt.touches && evt.touches[0].pageY;
+
+    let count = random(3, 5);
+    for (let i = 0; i < count; i++) this.fireworks.push(new Firework(
+    random(this.spawnA, this.spawnB),
+    this.height,
+    x,
+    y,
+    random(0, 260),
+    random(30, 110)));
+
+    this.counter = -1;
+
+  }
+
+  update(delta) {
+    ctx.globalCompositeOperation = 'hard-light';
+    ctx.fillStyle = `rgba(20,20,20,${7 * delta})`;
+    ctx.fillRect(0, 0, this.width, this.height);
+
+    ctx.globalCompositeOperation = 'lighter';
+    for (let firework of this.fireworks) firework.update(delta);
+
+    // if enough time passed... create new new firework
+    this.counter += delta * 3; // each second
+    if (this.counter >= 1) {
+      this.fireworks.push(new Firework(
+      random(this.spawnA, this.spawnB),
+      this.height,
+      random(0, this.width),
+      random(this.spawnC, this.spawnD),
+      random(0, 360),
+      random(30, 110)));
+      this.counter = 0;
+    }
+
+    // remove the dead fireworks
+    if (this.fireworks.length > 1000) this.fireworks = this.fireworks.filter(firework => !firework.dead);
+
+  }}
+
+
+class Firework {
+  constructor(x, y, targetX, targetY, shade, offsprings) {
+    this.dead = false;
+    this.offsprings = offsprings;
+
+    this.x = x;
+    this.y = y;
+    this.targetX = targetX;
+    this.targetY = targetY;
+
+    this.shade = shade;
+    this.history = [];
+  }
+  update(delta) {
+    if (this.dead) return;
+
+    let xDiff = this.targetX - this.x;
+    let yDiff = this.targetY - this.y;
+    if (Math.abs(xDiff) > 3 || Math.abs(yDiff) > 3) {// is still moving
+      this.x += xDiff * 2 * delta;
+      this.y += yDiff * 2 * delta;
+
+      this.history.push({
+        x: this.x,
+        y: this.y });
+
+
+      if (this.history.length > 20) this.history.shift();
+
+    } else {
+      if (this.offsprings && !this.madeChilds) {
+
+        let babies = this.offsprings / 2;
+        for (let i = 0; i < babies; i++) {
+          let targetX = this.x + this.offsprings * Math.cos(PI2 * i / babies) | 0;
+          let targetY = this.y + this.offsprings * Math.sin(PI2 * i / babies) | 0;
+
+          birthday.fireworks.push(new Firework(this.x, this.y, targetX, targetY, this.shade, 0));
+
+        }
+
+      }
+      this.madeChilds = true;
+      this.history.shift();
+    }
+
+    if (this.history.length === 0) this.dead = true;else
+    if (this.offsprings) {
+      for (let i = 0; this.history.length > i; i++) {
+        let point = this.history[i];
+        ctx.beginPath();
+        ctx.fillStyle = 'hsl(' + this.shade + ',100%,' + i + '%)';
+        ctx.arc(point.x, point.y, 1, 0, PI2, false);
+        ctx.fill();
+      }
+    } else {
+      ctx.beginPath();
+      ctx.fillStyle = 'hsl(' + this.shade + ',100%,50%)';
+      ctx.arc(this.x, this.y, 1, 0, PI2, false);
+      ctx.fill();
+    }
+
+  }}
+
+
+let canvas = document.getElementById('birthday');
+let ctx = canvas.getContext('2d');
+
+let then = timestamp();
+
+let birthday = new Birthday();
+window.onresize = () => birthday.resize();
+document.onclick = evt => birthday.onClick(evt);
+document.ontouchstart = evt => birthday.onClick(evt);
+
+(function loop() {
+  requestAnimationFrame(loop);
+
+  let now = timestamp();
+  let delta = now - then;
+
+  then = now;
+  birthday.update(delta / 1000);
+
+
+})();
+//# sourceURL=pen.js
+    </script>
+
+  
+
+
+
+</body></html>
