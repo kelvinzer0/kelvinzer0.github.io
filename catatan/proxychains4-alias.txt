@@ -1,8 +1,8 @@
 1. tambahin paling bawah .bash_profile
 
-alias curl="proxychains4 curl"
-alias git="proxychains4 git"
-alias go="proxychains4 go"
-alias brew="proxychains4 brew"
+alias curl="proxychains4 -q curl"
+alias git="proxychains4 -q git"
+alias go="proxychains4 -q go"
+alias brew="proxychains4 -q brew"
 
 2. eksekusi ini jika belum terbungkus: source .bash_profile
