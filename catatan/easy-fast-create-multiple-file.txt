@@ -1,0 +1,2 @@
+sample:
+  touch ledger_stock.go sale.go sale_adjustment.go sale_item.go sale_item_ledger_stock_product_lot.go sale_payment.go sale_payment_item.go sale_prescription.go sale_prescription_mixture.go sale_type.go
