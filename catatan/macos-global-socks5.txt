@@ -1,0 +1,17 @@
+Tools:
+(https://github.com/eycorsican/go-tun2socks/releases) https://web.archive.org/web/20200928041508/https://github-production-release-asset-2e65be.s3.amazonaws.com/138587856/bd3f1e00-da5f-11ea-89e5-b6f4be8220f0?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20200928%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20200928T041508Z&X-Amz-Expires=300&X-Amz-Signature=cba8c7b4d1a3e4111350c22355d939951550a4304774e1642cfdc4209d9910df&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=138587856&response-content-disposition=attachment%3B%20filename%3Dtun2socks-darwin-10.6-amd64&response-content-type=application%2Foctet-stream
+Command: 
+sudo ./tun2socks -tunAddr 10.255.0.2 -tunGw 10.255.0.1 -tunMask 255.255.255.0 -tunName tun1 -proxyServer 192.168.43.42:1081  -proxyType "socks" 
+
+# Backup route
+netstat -rn > backup-route.txt
+
+# Setup TUN
+Delete original gateway:
+sudo route delete default
+
+Add our TUN interface as the default gateway:
+sudo route add default 10.255.0.1
+
+Add a route for your proxy server to bypass the TUN interface:
+sudo route add 192.168.43.42/32 192.168.0.1
