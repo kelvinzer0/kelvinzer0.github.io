@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Catatan</title>
+  <style>
+
+    @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+    html {
+        -webkit-tap-highlight-color: transparent;
+        overflow-x: hidden;
+    }
+    
+    body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        overflow-x: hidden;
+    }
+    
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 12px;
+      margin: 8px;
+      width: 300px;
+      display: inline-block;
+    }
+
+    .card h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 12px;
+    }
+
+    .card a {
+      text-decoration: none;
+      color: #0366d6;
+    }
+
+    .card a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="repo-container">
+    <!-- Data will be populated here -->
+  </div>
+
+  <script>
+    fetch('https://api.github.com/repos/kelvinzer0/kelvinzer0.github.io/contents/catatan?ref=main')
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById('repo-container');
+
+        data.forEach(repo => {
+          const card = document.createElement('div');
+          card.classList.add('card');
+
+          const title = document.createElement('h3');
+          title.textContent = repo.name;
+          card.appendChild(title);
+
+          const link = document.createElement('a');
+          link.href = repo.html_url;
+          link.textContent = 'View on GitHub';
+          card.appendChild(link);
+
+          container.appendChild(card);
+        });
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  </script>
+</body>
+</html>
