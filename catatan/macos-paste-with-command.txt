@@ -1,0 +1,3 @@
+paste from clipboard:
+pbpaste > hasil_paste.txt
+php clipboard.php "$(pbpaste)"
