@@ -1,1 +1,4 @@
+manual:
    export all_proxy=socks5://your_proxy_address:your_proxy_port
+auto:
+   export all_proxy=$(networksetup -getsocksfirewallproxy Wi-Fi | awk '/Enabled: Yes/{getline; server=$2; getline; port=$2; print "socks5://" server ":" port}')
