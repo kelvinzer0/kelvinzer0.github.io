@@ -1,0 +1,21 @@
+vault-server.hcl:
+disable_mlock = true
+ui            = true
+
+listener "tcp" {
+  address     = "127.0.0.1:8200"
+  scheme      = "http"       # Set to "http" to disable TLS
+  tls_disable = 1            # 1 means TLS is disabled
+}
+
+storage "file" {
+  path = "/tmp/vault-data"
+}
+
+
+===========================================================
+
+
+./vault server -config=vault-server.hcl
+export VAULT_ADDR=http://127.0.0.1:8200
+./vault operator init   
