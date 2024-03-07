@@ -29,4 +29,7 @@ console.log(deployedAddress);
 **Kesimpulan:**
 Dengan mengikuti langkah-langkah di atas, Anda dapat mendeploy smart contract ke alamat yang sama di berbagai blockchain, memudahkan pengembangan dan pengelolaan smart contract Anda.
 
-Jika Anda memiliki pertanyaan atau umpan balik, jangan ragu untuk menghubungi saya.
+**Tambahan**
+Truffle + Metamask:
+1. Jalankan dashboard web:  truffle dashboard
+2. Migrasi dengan jaringan metamask di dashboard: truffle migrate --network dashboard
